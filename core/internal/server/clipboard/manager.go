@@ -764,6 +764,11 @@ func stateEqual(a, b *State) bool {
 	if len(a.History) != len(b.History) {
 		return false
 	}
+	for i := range a.History {
+		if a.History[i].ID != b.History[i].ID || a.History[i].Pinned != b.History[i].Pinned {
+			return false
+		}
+	}
 	return true
 }
 

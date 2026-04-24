@@ -130,9 +130,21 @@ func TestStateEqual_HistoryLengthDiffers(t *testing.T) {
 	assert.False(t, stateEqual(a, b))
 }
 
+func TestStateEqual_HistoryPinnedDiffers(t *testing.T) {
+	a := &State{Enabled: true, History: []Entry{{ID: 1, Pinned: true}}}
+	b := &State{Enabled: true, History: []Entry{{ID: 1, Pinned: false}}}
+	assert.False(t, stateEqual(a, b))
+}
+
+func TestStateEqual_HistoryIDDiffers(t *testing.T) {
+	a := &State{Enabled: true, History: []Entry{{ID: 1}}}
+	b := &State{Enabled: true, History: []Entry{{ID: 2}}}
+	assert.False(t, stateEqual(a, b))
+}
+
 func TestStateEqual_BothEqual(t *testing.T) {
-	a := &State{Enabled: true, History: []Entry{{ID: 1}, {ID: 2}}}
-	b := &State{Enabled: true, History: []Entry{{ID: 3}, {ID: 4}}}
+	a := &State{Enabled: true, History: []Entry{{ID: 1, Pinned: true}, {ID: 2}}}
+	b := &State{Enabled: true, History: []Entry{{ID: 1, Pinned: true}, {ID: 2}}, Current: &Entry{ID: 999}}
 	assert.True(t, stateEqual(a, b))
 }
 

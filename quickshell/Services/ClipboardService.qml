@@ -72,18 +72,31 @@ Singleton {
         }
     }
 
+    function refreshPinnedEntries() {
+        if (!clipboardAvailable) {
+            return;
+        }
+        DMSService.sendRequest("clipboard.getPinnedEntries", null, function (response) {
+            if (response.error) {
+                console.warn("ClipboardService: Failed to get pinned entries:", response.error);
+                return;
+            }
+            pinnedEntries = response.result || [];
+            pinnedCount = pinnedEntries.length;
+        });
+    }
+
     function refresh() {
         if (!clipboardAvailable) {
             return;
         }
+        refreshPinnedEntries();
         DMSService.sendRequest("clipboard.getHistory", null, function (response) {
             if (response.error) {
                 console.warn("ClipboardService: Failed to get history:", response.error);
                 return;
             }
             internalEntries = response.result || [];
-            pinnedEntries = internalEntries.filter(e => e.pinned);
-            pinnedCount = pinnedEntries.length;
             updateFilteredModel();
         });
     }
@@ -267,8 +280,7 @@ Singleton {
         function onClipboardStateUpdate(data) {
             const newHistory = data.history || [];
             internalEntries = newHistory;
-            pinnedEntries = newHistory.filter(e => e.pinned);
-            pinnedCount = pinnedEntries.length;
+            refreshPinnedEntries();
             updateFilteredModel();
         }
     }
